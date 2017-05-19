@@ -22,19 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle("multisort");
 
-    max = v[0];
-    for (int i0 = 1; i0 < v.size(); i0++){
-        if  (max < v[i0]){
-            max =v[i0];
-        }
-    }
-
-    for (int i = 0; i < v.size(); i++){
-        Rect *rect = new Rect();
-        rect->setRect(i*600/v.size(), 420 - v[i]*400/max, 600/v.size(), v[i]*400/max);
-        scene->addItem(rect);
-        r.push_back(rect);
-    }
     qsortbutton = new QPushButton("Quicksort", this);
     qsortbutton->setGeometry(QRect(QPoint(220, 450),QSize(160, 50)));
     connect(qsortbutton, SIGNAL (released()), this, SLOT (qsort()));
@@ -55,13 +42,16 @@ MainWindow::MainWindow(QWidget *parent)
     newbutton = new QPushButton("New Array", this);
     newbutton ->setGeometry(QRect(QPoint(320, 450),QSize(250, 50)));
     newbutton->setVisible(false);
-    connect(newbutton, SIGNAL (released()), this, SLOT (randomarray()));
+    connect(newbutton, SIGNAL (released()), this, SLOT (newarr()));
 
     //number = new QLineEdit;
     //scene->addWidget(number);
     //number->setGeometry(480,450,90,50);
     //number->setFont(QFont("KaiTi",30));
     //number->setVisible(false);
+
+    randomarray(100);
+
 }
 
 
@@ -84,6 +74,7 @@ void MainWindow::qsort(){
     int tempvalue = 0;
     int found = 0;
     int wall = 0;
+    int sorted = 0;
     while(sorted == 0){
         sorted = 1;
         for (int i = 0; i < check.size(); i++){
@@ -143,6 +134,7 @@ void MainWindow::bsort(){
     bsortbutton->setVisible(false);
     ssortbutton->setVisible(false);
     int tempvalue = 0;
+    int sorted = 0;
     while(sorted == 0){
         sorted = 1;
         for (int i = 0; i < v.size() - 1; i++){
@@ -229,15 +221,13 @@ void MainWindow::ssort(){
 void MainWindow::change(){
 
     for (int i = 0; i < v.size(); i++){
-        r[i]->setRect(i*600/v.size(), 420 - v[i]*400/max, 600/v.size(), v[i]*400/max);
+        r[i]->setRect(i*600/v.size(), 420 - v[i]*400/vsize, 600/v.size(), v[i]*400/vsize);
     }
 
 }
 
 void MainWindow::resetarray(){
-    v = v2;
     change();
-    sorted = 0;
     qsortbutton->setVisible(true);
     bsortbutton->setVisible(true);
     ssortbutton->setVisible(true);
@@ -254,33 +244,13 @@ void MainWindow::delay(int x){
     }
 }
 
-void MainWindow::randomarray(){
-    v = {};
-    int x = 1000;
-    changerect(x);
-    for (int i = 0; i < x; i++){
-        int check = 0;
-        int randomValue;
-        while (check == 0){
-            randomValue = qrand() % x + 1;
-            check = 1;
-            for (int i2 = 0; i2 < i; i2++){
-                if (v[i2] == randomValue){
-                    check = 0;
-                }
-            }
-        }
-        v.push_back(randomValue);
-    }
-    max = v[0];
-    for (int i0 = 1; i0 < v.size(); i0++){
-        if  (max < v[i0]){
-            max =v[i0];
-        }
-    }
-    v2 = v;
+void MainWindow::randomarray(int num){
+    v.clear();
+    changerect(num);
+    for (int i=1; i<=num; ++i) v.push_back(i);
+    std::random_shuffle ( v.begin(), v.end());
+    vsize = num;
     change();
-    sorted = 0;
     qsortbutton->setVisible(true);
     bsortbutton->setVisible(true);
     ssortbutton->setVisible(true);
@@ -297,10 +267,14 @@ void MainWindow::changerect(int y){
     //number->setGeometry(480,450,90,50);
     //number->setFont(QFont("KaiTi",30));
     //number->setVisible(false);
-    for (int i = 0; i < y; i++){
+    for (int i = 0; i < y; ++i){
         Rect *rect = new Rect();
         scene->addItem(rect);
         r.push_back(rect);
     }
 
+}
+
+void MainWindow::newarr(){
+    randomarray(1000);
 }
