@@ -30,9 +30,9 @@ MainWindow::MainWindow(QWidget *parent)
     bsortbutton->setGeometry(QRect(QPoint(30, 450),QSize(160, 50)));
     connect(bsortbutton, SIGNAL (released()), this, SLOT (bsort()));
 
-    ssortbutton = new QPushButton("Shellsort", this);
-    ssortbutton->setGeometry(QRect(QPoint(410, 450),QSize(160, 50)));
-    connect(ssortbutton, SIGNAL (released()), this, SLOT (ssort()));
+    csortbutton = new QPushButton("Combsort", this);
+    csortbutton->setGeometry(QRect(QPoint(410, 450),QSize(160, 50)));
+    connect(csortbutton, SIGNAL (released()), this, SLOT (csort()));
 
     resetbutton = new QPushButton("Reset", this);
     resetbutton ->setGeometry(QRect(QPoint(30, 450),QSize(250, 50)));
@@ -60,12 +60,41 @@ MainWindow::~MainWindow(){
 
 }
 
+void MainWindow::qsorthelper(int low, int high){
+    if (low < high){
+        int pivot = v[high];
+        int wall = low - 1;
+        for (int i = low; i <= high - 1; ++i){
+            if (v[i] <= pivot){
+                wall = wall + 1;
+                int tempvalue = v[wall];
+                v[wall] = v[i];
+                v[i] = tempvalue;
+                change();
+            }
+        }
+        wall = wall + 1;
+        int tempvalue = v[wall];
+        v[wall] = v[high];
+        v[high] = tempvalue;
+        change();
+        qsorthelper(low, wall - 1);
+        qsorthelper(wall + 1, high);
+    }
+}
+
 void MainWindow::qsort(){
     qsortbutton->setVisible(false);
     bsortbutton->setVisible(false);
-    ssortbutton->setVisible(false);
+    csortbutton->setVisible(false);
+    qsorthelper(0, vsize - 1);
+    resetbutton->setVisible(true);
+    newbutton->setVisible(true);
+    //number->setVisible(true);
+
+    /* OLD IMPLEMENTATION(SOMEHOW IT WORKED):
     std::vector<int> check = {};
-    for (int i = 0; i < v.size(); i++){
+    for (int i = 0; i < vsize; i++){
         check.push_back(0);
     }
     int distance = 0;
@@ -77,7 +106,7 @@ void MainWindow::qsort(){
     int sorted = 0;
     while(sorted == 0){
         sorted = 1;
-        for (int i = 0; i < check.size(); i++){
+        for (int i = 0; i < vsize; i++){
             if (check[i] == 1 && found == 0){
 
             } else if (check[i] == 1 && found == 1){
@@ -105,7 +134,6 @@ void MainWindow::qsort(){
                     if (wall != x){
                         v.erase(v.begin() + x);
                         v.insert(v.begin()+wall,tempvalue);
-                        delay(1);
                         change();
                     }
                     wall = wall + 1;
@@ -114,7 +142,6 @@ void MainWindow::qsort(){
             }
             v.erase(v.begin() + start + distance - 1);
             v.insert(v.begin()+wall,base);
-            delay(1);
             check[wall] = 1;
         }
 
@@ -123,103 +150,65 @@ void MainWindow::qsort(){
         start = 0;
         found = 0;
         wall = 0;
-    }
-    resetbutton->setVisible(true);
-    newbutton->setVisible(true);
-    //number->setVisible(true);
+    }*/
 }
 
 void MainWindow::bsort(){
     qsortbutton->setVisible(false);
     bsortbutton->setVisible(false);
-    ssortbutton->setVisible(false);
-    int tempvalue = 0;
-    int sorted = 0;
-    while(sorted == 0){
-        sorted = 1;
-        for (int i = 0; i < v.size() - 1; i++){
-            if (v[i] > v[i + 1]){
-                tempvalue = v[i];
-                v[i] = v[i+1];
-                v[i+1] = tempvalue;
-                delay(1);
-                change();
-                sorted = 0;
-            }
-        }
-    }
+    csortbutton->setVisible(false);
+    for (int i = 0 ; i < ( vsize - 1 ); ++i)
+     {
+       for (int j = 0 ; j < vsize - i - 1; ++j)
+       {
+         if (v[j] > v[j+1])
+         {
+           int tempvalue = v[j];
+           v[j] = v[j+1];
+           v[j+1] = tempvalue;
+           change();
+         }
+       }
+     }
     resetbutton->setVisible(true);
     newbutton->setVisible(true);
     //number->setVisible(true);
 }
 
-void MainWindow::ssort(){
+void MainWindow::csort(){
     qsortbutton->setVisible(false);
     bsortbutton->setVisible(false);
-    ssortbutton->setVisible(false);
-    std::vector<int> gapsize = {};
-    int size = 1;
-    while ((qPow(3,size) - 1) / 2 < v.size() / 2){
-        gapsize.insert(gapsize.begin(), (qPow(3,size) - 1) / 2);
-        size = size + 1;
-    }
-    for (int i = 0; i < gapsize.size(); i++){
-        if (gapsize[i] != 1){
-            std::vector<std::vector<int>> list(gapsize[i], std::vector<int>());
-            int count = 0;
-            for (int i2 = 0; i2 < v.size(); i2++){
-                if (count < list.size() - 1){
-                    list[count].push_back(v[i2]);
-                    count = count + 1;
-                } else {
-                    list[count].push_back(v[i2]);
-                    count = 0;
-                }
-            }
-            for (int i3 = 0; i3 < list.size(); i3 ++){
-                int tempvalue = 0;
-                for (int i4 = 1; i4 < list[i3].size() ; i4 ++){
-                    int location = i4;
-                    while(list[i3][i4] < list[i3][location - 1] and location > 0){
-                        location = location - 1;
-                    }
-                    for (int i7 = i4; i7 > location; i7 --){
-                        tempvalue = list[i3][i7];
-                        list[i3][i7] = list[i3][i7 - 1];
-                        list[i3][i7 - 1] = tempvalue;
-                        v[i7 * gapsize[i] + i3] = v[(i7-1) * gapsize[i] + i3] ;
-                        v[(i7-1) * gapsize[i] + i3] = tempvalue;
-                        change();
-                        delay(1);
+    csortbutton->setVisible(false);
 
-                    }
-                }
-            }
-        } else {
-            int tempvalue = 0;
-            for (int i5 = 1; i5 < v.size(); i5 ++){
-                int location = i5;
-                while(v[i5] < v[location - 1] and location > 0){
-                    location = location - 1;
-                }
-                for (int i6 = i5; i6 > location; i6 --){
-                    tempvalue = v[i6];
-                    v[i6] = v[i6 - 1];
-                    v[i6 - 1] = tempvalue;
-                    change();
-                    delay(1);
-                }
+    int gap = vsize;
+    bool sorted = false;
 
+    while(!sorted){
+        gap = gap * 3 / 4;
+        if (gap == 0){
+            gap = 1;
+        }
+        if (gap == 1){
+            sorted = true;
+        }
+        for (int i = 0; i + gap < vsize; ++i){
+            if (v[i] > v[i+gap]){
+                int temp = v[i+gap];
+                v[i+gap] = v[i];
+                v[i] = temp;
+                sorted = false;
+                change();
             }
         }
     }
+
     resetbutton->setVisible(true);
     newbutton->setVisible(true);
     //number->setVisible(true);
 }
 
 void MainWindow::change(){
-
+    delay(1);
     for (int i = 0; i < v.size(); i++){
         r[i]->setRect(i*600/v.size(), 420 - v[i]*400/vsize, 600/v.size(), v[i]*400/vsize);
     }
@@ -230,7 +219,7 @@ void MainWindow::resetarray(){
     change();
     qsortbutton->setVisible(true);
     bsortbutton->setVisible(true);
-    ssortbutton->setVisible(true);
+    csortbutton->setVisible(true);
     resetbutton->setVisible(false);
     newbutton->setVisible(false);
     //number->setVisible(false);
@@ -253,7 +242,7 @@ void MainWindow::randomarray(int num){
     change();
     qsortbutton->setVisible(true);
     bsortbutton->setVisible(true);
-    ssortbutton->setVisible(true);
+    csortbutton->setVisible(true);
     resetbutton->setVisible(false);
     newbutton->setVisible(false);
     //number->setVisible(false);

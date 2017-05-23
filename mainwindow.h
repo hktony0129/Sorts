@@ -24,14 +24,15 @@ public:
 private:
     QPushButton *qsortbutton;
     QPushButton *bsortbutton;
-    QPushButton *ssortbutton;
+    QPushButton *csortbutton;
     QPushButton *newbutton;
     QPushButton *resetbutton;
     QLineEdit *number;
+    void qsorthelper(int low, int high);
 public slots:
     void qsort();
     void bsort();
-    void ssort();
+    void csort();
     void change();
     void resetarray();
     void newarr();
